@@ -1,6 +1,6 @@
-Professor.class
 Main.class
+model/Professor.class
 model/Atleta.class
-Graduacao.class
-Equipe.class
-Treino.class
+model/Graduacao.class
+model/Equipe.class
+model/Treino.class
