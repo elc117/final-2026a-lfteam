@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Jiu-Jitsu Manager</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family: Arial, Helvetica, sans-serif;
+    background:#f5f5f5;
+}
+
+header{
+    background:#1f2937;
+    color:white;
+    text-align:center;
+    padding:30px;
+}
+
+header h1{
+    margin-bottom:10px;
+}
+
+.container{
+    max-width:1000px;
+    margin:30px auto;
+    padding:20px;
+}
+
+.card{
+    background:white;
+    border-radius:10px;
+    padding:20px;
+    box-shadow:0 2px 10px rgba(0,0,0,.1);
+}
+
+button{
+    background:#2563eb;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-top:15px;
+}
+
+button:hover{
+    opacity:0.9;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th, td{
+    border:1px solid #ddd;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#2563eb;
+    color:white;
+}
+
+footer{
+    text-align:center;
+    margin-top:30px;
+    color:#666;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+    <h1>🥋 Jiu-Jitsu Manager</h1>
+    <p>Sistema de Gerenciamento de Equipes de Jiu-Jitsu</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+
+        <h2>Atletas Cadastrados</h2>
+
+        <p>
+            Esta página consome a API desenvolvida em Java utilizando
+            Maven e Javalin.
+        </p>
+
+        <button onclick="listarAtletas()">
+            Carregar Atletas
+        </button>
+
+        <table id="tabela" style="display:none">
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Idade</th>
+                    <th>Faixa</th>
+                    <th>Peso</th>
+                </tr>
+            </thead>
+
+            <tbody id="resultado"></tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<footer>
+    Projeto desenvolvido para a disciplina de Paradigmas de Programação
+</footer>
+
+<script>
+
+async function listarAtletas() {
+
+    try {
+
+        const resposta = await fetch(
+            "http://localhost:7070/atletas"
+        );
+
+        const atletas = await resposta.json();
+
+        const tabela = document.getElementById("resultado");
+
+        tabela.innerHTML = "";
+
+        atletas.forEach(atleta => {
+
+            tabela.innerHTML += `
+                <tr>
+                    <td>${atleta.id}</td>
+                    <td>${atleta.nome}</td>
+                    <td>${atleta.idade}</td>
+                    <td>${atleta.faixa}</td>
+                    <td>${atleta.peso}</td>
+                </tr>
+            `;
+
+        });
+
+        document.getElementById("tabela").style.display = "table";
+
+    } catch(error) {
+
+        alert("Não foi possível conectar à API.");
+
+    }
+
+}
+
+</script>
+
+</body>
+</html>
