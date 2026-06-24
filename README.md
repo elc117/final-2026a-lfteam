@@ -22,6 +22,7 @@ Durante o desenvolvimento do projeto, comecei identificando quais informações 
 Precisei ver exemplos e consultar materias para iniciar e desenvolver os códigos e entender com os endpoints funcinavam e qual era alógica por trás deles, relembrar e ver estruturas que melhor se encaixavam.
 
 A fase que apresentou mais desafios foi a integração com o banco de dados PostgreSQL e a publicação da aplicação. Encontrei dificuldades na conexão com o banco hospedado no Render, pois o formato da URL fornecida pela plataforma não era compatível com o esperado pelo JDBC. Nesta parte, precisei utilizar ajuda da IA para me ajudar a identificar o erro em questão e uma possivel solução, onde implementei uma conversão automática da URL, resolvendo o problema, essa solução foi utilizada por recomendação da IA. Também precisei configurar o CORS para permitir a comunicação entre o frontend e o backend hospedados em plataformas diferentes, no qual também precisei buscar ajuda com IA. Outro desafio foi o deploy da aplicação, já que o Render não executava o projeto Java da forma esperada. A solução encontrada foi utilizar Docker para empacotar toda a aplicação, permitindo que ela fosse executada corretamente em ambiente de produção.
+
 Eu já havia trabalhado com base de dados antes mas de uma forma totalmente diferente e mais "simples", então de começo fiquei bem desorientado para entender e implementar o que o projeto pedia.
 
 ---
