@@ -17,12 +17,14 @@ public class Main {
 
         System.out.println("INICIOU O MAIN");
 
-        // Conexão com PostgreSQL via variável de ambiente
+        // Monta a URL JDBC corretamente a partir da DATABASE_URL do Render
         String dbUrl = System.getenv("DATABASE_URL");
-        conn = DriverManager.getConnection("jdbc:" + dbUrl);
+        // DATABASE_URL vem no formato: postgresql://user:pass@host/db
+        // JDBC precisa de:             jdbc:postgresql://host:5432/db?user=user&password=pass
+        String jdbcUrl = toJdbcUrl(dbUrl);
+        conn = DriverManager.getConnection(jdbcUrl);
         System.out.println("CONECTADO AO BANCO!");
 
-        // Criação das tabelas se não existirem
         criarTabelas();
 
         int port = System.getenv("PORT") != null
@@ -337,6 +339,22 @@ public class Main {
         System.out.println("VAI INICIAR O JAVALIN NA PORTA " + port);
         app.start(port);
         System.out.println("JAVALIN INICIADO");
+    }
+
+    // Converte URL do Render para formato JDBC
+    // De: postgresql://user:pass@host/db
+    // Para: jdbc:postgresql://host:5432/db?user=user&password=pass
+    static String toJdbcUrl(String url) {
+        // Remove o prefixo "postgresql://"
+        String sem = url.replace("postgresql://", "");
+        // Separa credenciais do resto: user:pass@host/db
+        String[] partes = sem.split("@");
+        String[] credenciais = partes[0].split(":");
+        String usuario = credenciais[0];
+        String senha = credenciais[1];
+        // host/db
+        String hostDb = partes[1];
+        return "jdbc:postgresql://" + hostDb + "?user=" + usuario + "&password=" + senha + "&sslmode=require";
     }
 
     static void criarTabelas() throws SQLException {
