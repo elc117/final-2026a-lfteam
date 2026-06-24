@@ -9,7 +9,7 @@
 
 ## 2. Proposta
 
-Sistema web para gerenciamento de equipes de Jiu-Jitsu, permitindo o cadastro e controle de atletas, professores, equipes, treinos e graduações. O projeto se encaixa na temática "grupo" por gerenciar equipes e seus integrantes.
+Sistema web para gerenciamento de equipes de Jiu-Jitsu, permitindo o cadastro e controle de atletas, professores, equipes, treinos e graduações.
 
 Desenvolvido com Java 21 + Javalin para o backend (API REST) e HTML/CSS/JavaScript para o frontend.
 
