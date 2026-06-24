@@ -3,117 +3,366 @@
 <head>
 <meta charset="UTF-8">
 <title>Jiu-Jitsu Manager</title>
-
 <style>
-body{
-    font-family: Arial;
-    background:#f4f4f4;
-    margin:0;
-}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-header{
-    background:#1f2937;
-    color:white;
-    text-align:center;
-    padding:20px;
-}
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f4f4;
+  }
 
-.container{
-    max-width:900px;
-    margin:auto;
-    padding:20px;
-}
+  header {
+    background: #1f2937;
+    color: white;
+    text-align: center;
+    padding: 20px;
+  }
 
-button{
-    margin:5px;
-    padding:10px 15px;
-    background:#2563eb;
-    color:white;
-    border:none;
-    cursor:pointer;
-    border-radius:6px;
-}
+  header h1 { font-size: 1.8rem; }
+  header p  { font-size: 0.9rem; color: #9ca3af; margin-top: 4px; }
 
-table{
-    width:100%;
-    margin-top:20px;
-    border-collapse:collapse;
-    background:white;
-}
+  nav {
+    background: #111827;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 10px;
+  }
 
-th, td{
-    border:1px solid #ddd;
-    padding:8px;
-    text-align:center;
-}
+  nav button {
+    padding: 8px 16px;
+    background: #374151;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
 
-th{
-    background:#2563eb;
-    color:white;
-}
+  nav button:hover, nav button.ativo { background: #2563eb; }
+
+  .container { max-width: 960px; margin: 30px auto; padding: 0 16px; }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  }
+
+  .card h2 { margin-bottom: 16px; color: #1f2937; font-size: 1.1rem; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+
+  input:focus { outline: none; border-color: #2563eb; }
+
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .btn-primary { background: #2563eb; color: white; }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-danger  { background: #dc2626; color: white; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-warning { background: #d97706; color: white; }
+  .btn-warning:hover { background: #b45309; }
+  .btn-secondary { background: #6b7280; color: white; }
+  .btn-secondary:hover { background: #4b5563; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+  }
+
+  th {
+    background: #2563eb;
+    color: white;
+    padding: 10px 8px;
+    text-align: left;
+  }
+
+  td { padding: 9px 8px; border-bottom: 1px solid #e5e7eb; }
+  tr:hover td { background: #f9fafb; }
+
+  .td-actions { display: flex; gap: 6px; }
+
+  .msg {
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    display: none;
+  }
+
+  .msg.sucesso { background: #d1fae5; color: #065f46; display: block; }
+  .msg.erro    { background: #fee2e2; color: #991b1b; display: block; }
+
+  #secao { display: none; }
 </style>
 </head>
-
 <body>
 
 <header>
-    <h1>🥋 Jiu-Jitsu Manager</h1>
+  <h1>🥋 Jiu-Jitsu Manager</h1>
+  <p>Sistema de Gerenciamento de Equipes</p>
 </header>
 
+<nav>
+  <button onclick="abrirSecao('atletas')">Atletas</button>
+  <button onclick="abrirSecao('professores')">Professores</button>
+  <button onclick="abrirSecao('equipes')">Equipes</button>
+  <button onclick="abrirSecao('graduacoes')">Graduações</button>
+  <button onclick="abrirSecao('treinos')">Treinos</button>
+</nav>
+
 <div class="container">
-
-    <h3>Selecione uma entidade:</h3>
-
-    <button onclick="carregar('atletas')">Atletas</button>
-    <button onclick="carregar('professores')">Professores</button>
-    <button onclick="carregar('equipes')">Equipes</button>
-    <button onclick="carregar('graduacoes')">Graduações</button>
-    <button onclick="carregar('treinos')">Treinos</button>
-
-    <table id="tabela"></table>
-
+  <div id="msg" class="msg"></div>
+  <div id="secao"></div>
 </div>
 
 <script>
-
-// ✅ Troque pela URL do Render após o deploy do backend
-// Exemplo: "https://jiujitsu-manager.onrender.com"
-// Para rodar localmente, deixe como "http://localhost:7070"
 const API_BASE = "https://jiu-jitsu-maneger.onrender.com";
 
-async function carregar(tipo){
+let secaoAtual = "";
+let editandoId = null;
 
-    const resposta = await fetch(`${API_BASE}/${tipo}`);
-    const dados = await resposta.json();
+// ── Configuração de cada entidade ──────────────────────────────────────────
 
-    let html = "";
+const config = {
+  atletas: {
+    titulo: "Atletas",
+    campos: [
+      { id: "nome",   label: "Nome",       type: "text"   },
+      { id: "idade",  label: "Idade",      type: "number" },
+      { id: "faixa",  label: "Faixa",      type: "text"   },
+      { id: "peso",   label: "Peso (kg)",  type: "number" }
+    ],
+    colunas: ["id", "nome", "idade", "faixa", "peso"],
+    idField: "id",
+    idType: "int"
+  },
+  professores: {
+    titulo: "Professores",
+    campos: [
+      { id: "nome",      label: "Nome",       type: "text" },
+      { id: "graduacao", label: "Graduação",  type: "text" }
+    ],
+    colunas: ["id", "nome", "graduacao"],
+    idField: "id",
+    idType: "long"
+  },
+  equipes: {
+    titulo: "Equipes",
+    campos: [
+      { id: "nome",   label: "Nome",   type: "text" },
+      { id: "cidade", label: "Cidade", type: "text" }
+    ],
+    colunas: ["id", "nome", "cidade"],
+    idField: "id",
+    idType: "long"
+  },
+  graduacoes: {
+    titulo: "Graduações",
+    campos: [
+      { id: "faixaAnterior",  label: "Faixa Anterior", type: "text" },
+      { id: "faixaNova",      label: "Faixa Nova",      type: "text" },
+      { id: "dataGraduacao",  label: "Data",            type: "date" }
+    ],
+    colunas: ["id", "faixaAnterior", "faixaNova", "dataGraduacao"],
+    idField: "id",
+    idType: "long"
+  },
+  treinos: {
+    titulo: "Treinos",
+    campos: [
+      { id: "data",      label: "Data",      type: "date" },
+      { id: "descricao", label: "Descrição", type: "text" }
+    ],
+    colunas: ["id", "data", "descricao"],
+    idField: "id",
+    idType: "long"
+  }
+};
 
-    if(dados.length > 0){
+// ── Renderiza a seção ──────────────────────────────────────────────────────
 
-        html += "<tr>";
+function abrirSecao(entidade) {
+  secaoAtual = entidade;
+  editandoId = null;
+  const c = config[entidade];
 
-        for(let chave in dados[0]){
-            html += `<th>${chave}</th>`;
-        }
+  // destaca botão ativo
+  document.querySelectorAll("nav button").forEach(b => b.classList.remove("ativo"));
+  event.target.classList.add("ativo");
 
-        html += "</tr>";
+  const campos = c.campos.map(f =>
+    `<input id="f_${f.id}" type="${f.type}" placeholder="${f.label}">`
+  ).join("");
 
-        dados.forEach(item => {
+  document.getElementById("secao").style.display = "block";
+  document.getElementById("secao").innerHTML = `
+    <div class="card">
+      <h2>Cadastrar ${c.titulo.slice(0,-1)}</h2>
+      <div class="form-grid">${campos}</div>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="salvar()">💾 Salvar</button>
+        <button class="btn-secondary" onclick="limparForm()">✖ Cancelar</button>
+      </div>
+    </div>
 
-            html += "<tr>";
+    <div class="card">
+      <h2>📋 Lista de ${c.titulo}</h2>
+      <div id="tabela-wrap">Carregando...</div>
+    </div>
+  `;
 
-            for(let chave in item){
-                html += `<td>${item[chave]}</td>`;
-            }
-
-            html += "</tr>";
-        });
-    }
-
-    document.getElementById("tabela").innerHTML = html;
+  carregar();
 }
 
-</script>
+// ── Carrega e renderiza tabela ─────────────────────────────────────────────
 
+async function carregar() {
+  const c = config[secaoAtual];
+  try {
+    const res = await fetch(`${API_BASE}/${secaoAtual}`);
+    const dados = await res.json();
+
+    if (dados.length === 0) {
+      document.getElementById("tabela-wrap").innerHTML = "<p style='color:#6b7280'>Nenhum registro encontrado.</p>";
+      return;
+    }
+
+    const ths = c.colunas.map(col => `<th>${col}</th>`).join("") + "<th>Ações</th>";
+    const trs = dados.map(item => {
+      const tds = c.colunas.map(col => `<td>${item[col] ?? ""}</td>`).join("");
+      const id = item[c.idField];
+      return `<tr>
+        ${tds}
+        <td>
+          <div class="td-actions">
+            <button class="btn-warning" onclick='preencher(${JSON.stringify(item)})'>✏️ Editar</button>
+            <button class="btn-danger"  onclick="deletar(${id})">🗑️ Excluir</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join("");
+
+    document.getElementById("tabela-wrap").innerHTML =
+      `<table><tr>${ths}</tr>${trs}</table>`;
+  } catch (e) {
+    document.getElementById("tabela-wrap").innerHTML = "<p style='color:red'>Erro ao carregar dados.</p>";
+  }
+}
+
+// ── Salvar (POST ou PUT) ───────────────────────────────────────────────────
+
+async function salvar() {
+  const c = config[secaoAtual];
+  const body = {};
+
+  for (const f of c.campos) {
+    const el = document.getElementById(`f_${f.id}`);
+    const val = el.value.trim();
+    if (!val) { mostrarMsg("Preencha todos os campos.", "erro"); return; }
+    body[f.id] = f.type === "number" ? Number(val) : val;
+  }
+
+  const url    = editandoId ? `${API_BASE}/${secaoAtual}/${editandoId}` : `${API_BASE}/${secaoAtual}`;
+  const method = editandoId ? "PUT" : "POST";
+
+  try {
+    const res = await fetch(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    if (res.ok) {
+      mostrarMsg(editandoId ? "Atualizado com sucesso!" : "Cadastrado com sucesso!", "sucesso");
+      limparForm();
+      carregar();
+    } else {
+      mostrarMsg("Erro ao salvar.", "erro");
+    }
+  } catch (e) {
+    mostrarMsg("Erro de conexão.", "erro");
+  }
+}
+
+// ── Preenche formulário para edição ───────────────────────────────────────
+
+function preencher(item) {
+  const c = config[secaoAtual];
+  editandoId = item[c.idField];
+
+  for (const f of c.campos) {
+    const el = document.getElementById(`f_${f.id}`);
+    if (el) el.value = item[f.id] ?? "";
+  }
+
+  document.querySelector(".card h2").textContent = `Editando ${c.titulo.slice(0,-1)} #${editandoId}`;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// ── Deletar ────────────────────────────────────────────────────────────────
+
+async function deletar(id) {
+  if (!confirm("Tem certeza que deseja excluir?")) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/${secaoAtual}/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      mostrarMsg("Excluído com sucesso!", "sucesso");
+      carregar();
+    } else {
+      mostrarMsg("Erro ao excluir.", "erro");
+    }
+  } catch (e) {
+    mostrarMsg("Erro de conexão.", "erro");
+  }
+}
+
+// ── Utilitários ────────────────────────────────────────────────────────────
+
+function limparForm() {
+  editandoId = null;
+  const c = config[secaoAtual];
+  c.campos.forEach(f => {
+    const el = document.getElementById(`f_${f.id}`);
+    if (el) el.value = "";
+  });
+  const h2 = document.querySelector(".card h2");
+  if (h2) h2.textContent = `Cadastrar ${c.titulo.slice(0,-1)}`;
+}
+
+function mostrarMsg(texto, tipo) {
+  const el = document.getElementById("msg");
+  el.textContent = texto;
+  el.className = `msg ${tipo}`;
+  setTimeout(() => { el.className = "msg"; el.textContent = ""; }, 3000);
+}
+</script>
 </body>
 </html>
